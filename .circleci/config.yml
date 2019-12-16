@@ -4,6 +4,9 @@ jobs:
     docker:
       - image: debian:stretch
 
+    orbs:
+      fast:wallarm/fast@1.1.0    
+
     steps:
       - checkout
 
@@ -40,6 +43,17 @@ jobs:
             docker-compose up -d  selenium \
             && sleep 5 \
             && docker-compose run --name app-test --service-ports app-test bundle exec rspec spec/features/posts_spec.rb
+
+      - run:
+          command: >
+            docker run -d --name app-test -p 3000:3000
+            wallarm/fast-example-rails
+          name: Run application with FAST Orb
+
+      - fast/run_security_tests:
+          app_port: '3000'
+          test_record_id:3670
+          test_run_policy_id:87
 
    #   - run:
    #       name: Run security tests
