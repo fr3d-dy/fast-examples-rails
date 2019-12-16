@@ -34,13 +34,6 @@ jobs:
             docker-compose build
 
       - run:
-          name: Run specs & record baselines
-          command: |
-            docker-compose up -d  selenium \
-            && sleep 5 \
-            && docker-compose run --name app-test --service-ports app-test bundle exec rspec spec/features/posts_spec.rb
-
-      - run:
           command: >
             docker-compose up -d app-test \
             && docker run -d --name app-test -p 3000:3000 app-test
