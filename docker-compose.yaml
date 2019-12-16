@@ -21,7 +21,7 @@ services:
       WALLARM_API_TOKEN: ${WALLARM_API_TOKEN}
       WALLARM_API_HOST: us1.api.wallarm.com
       CI_MODE: recording
-      TEST_RUN_POLICY_ID: 94
+     # TEST_RUN_POLICY_ID: 87
     ports:
       - '8080:8080'
     networks:
@@ -34,8 +34,8 @@ services:
     ports: ['4444:4444']
     logging:
       driver: none
-    environment:
-      http_proxy: http://fast:8080
+#    environment:
+ #      http_proxy: http://fast:8080
     networks:
       main:
         aliases:
