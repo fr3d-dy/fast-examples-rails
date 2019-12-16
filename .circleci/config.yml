@@ -42,6 +42,7 @@ jobs:
           app_port: '3000'
           test_record_id: '3670'
           policy_id: '87'
+          app_host: 'app-test'
 
 orbs:
   fast: 'wallarm/fast@1.1.0'
