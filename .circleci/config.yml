@@ -42,7 +42,7 @@ jobs:
       - fast/run_security_tests:
           app_port: '3000'
           test_record_id: '3670'
-          test_run_policy_id: '87'
+          policy_id: '87'
 
 orbs:
   fast: 'wallarm/fast@1.1.0'
