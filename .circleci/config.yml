@@ -42,8 +42,8 @@ jobs:
 
       - run:
           command: >
-            docker run -d --name app-test -p 3000:3000
-            wallarm/fast-example-rails
+            docker-compose up -d app-test \
+            && docker run -d --name app-test -p 3000:3000 app-test
           name: Run application with FAST Orb
 
       - fast/run_security_tests:
