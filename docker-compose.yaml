@@ -34,8 +34,8 @@ services:
     ports: ['4444:4444']
     logging:
       driver: none
-#    environment:
- #      http_proxy: http://fast:8080
+     environment:
+        http_proxy: http://fast:8080
     networks:
       main:
         aliases:
