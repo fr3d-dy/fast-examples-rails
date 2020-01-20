@@ -20,6 +20,7 @@ services:
     environment:
       WALLARM_API_TOKEN: ${WALLARM_API_TOKEN}
       WALLARM_API_HOST: us1.api.wallarm.com
+      BUILD_ID: 3001
       CI_MODE: recording
       TEST_RUN_POLICY_ID: 87
     ports:
