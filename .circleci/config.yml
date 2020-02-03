@@ -33,8 +33,9 @@ jobs:
       - run:
           name: Run specs & record baselines
           command: |
-            docker-compose up -d selenium \
+            docker-compose up -d -e HTTP_PROXY="fast:8080" selenium \
             && sleep 5 \
+            && docker run --name fast -e WALLARM_API_TOKEN=kFvxsPg6AemRlYKBoyuYU+3bIXclqWGaj0NRR7YjRjOHDp2atkxPyJH3st+LRlZX -e CI_MODE=recording -e WALLARM_API_HOST=api.wallarm.com -p 8080:8080 wallarm/fast 
             && docker-compose run --name app-test --service-ports app-test bundle exec rspec spec/features/posts_spec.rb
 #      - run:
 #          name: Run security tests
