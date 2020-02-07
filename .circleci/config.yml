@@ -43,7 +43,7 @@ jobs:
             && sleep 5 \
             && docker run --name fast -d -e WALLARM_API_TOKEN=kFvxsPg6AemRlYKBoyuYU+3bIXclqWGaj0NRR7YjRjOHDp2atkxPyJH3st+LRlZX -e CI_MODE=recording -e WALLARM_API_HOST=api.wallarm.com -p 8080:8080 --network inner-net --rm wallarm/fast \
             && sleep 5 \
-            && docker build \
+            && docker build . \
             && docker run --rm --name app-test --network inner-net -e CAPYBARA_SERVER_HOST=app-test -p 3000:3000 app-test bundle exec rspec spec/features/posts_spec.rb
 
       - run:
