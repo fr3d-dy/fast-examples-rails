@@ -41,7 +41,7 @@ jobs:
           command: |
            # docker network create inner-net \
            # && sleep 5 \
-            docker run --rm -d --name app-test --network inner-net -e CAPYBARA_SERVER_HOST=app-test -p 3000:3000 app-test \
+            docker run --rm -d --name app-test --network inner-net -e CAPYBARA_SERVER_HOST=app-test -p 3000:3000 wallarm/fast-example-rails:latest \
             && sleep 5 \
             && docker run --name fast -e WALLARM_API_TOKEN=$WALLARM_API_TOKEN -e TEST_RECORD_ID=$TEST_RECORD_ID -e CI_MODE=testing -e WALLARM_API_HOST=api.wallarm.com -p 8080:8080 --network inner-net -e TEST_RUN_POLICY_ID=240 -e TEST_RUN_URI="http://app-test:3000" --rm wallarm/fast \
             && sleep 5 \
