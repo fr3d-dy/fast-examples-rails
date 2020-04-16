@@ -1,0 +1,46 @@
+pipeline {
+   agent any
+
+   stages {
+      stage('Test') {
+          parallel {
+              stage('Test Num 1') {
+                steps {
+                    sh label: 'create network', script: 'docker network create my-network'
+                    sh label: 'run fast with ci_mode=recording', script: 'docker run --name fast -d -e WALLARM_API_TOKEN=$WALLARM_API_TOKEN -e CI_MODE="recording" -e WALLARM_API_HOST="api.wallarm.com" -p 8088:8080 --network my-network -e BUILD_ID=${env.BUILD_ID} --rm wallarm/fast '
+                    sh label: 'run selenium', script: ' docker run --rm -d --name selenium -p 4444:4444 -e http_proxy=\'http://fast:8080\' -e https_proxy=\'https://fast:8080\' --network my-network selenium/standalone-firefox:latest '
+                    sh label: 'run app-test', script: ' docker run --rm --name app-test --network my-network -e CAPYBARA_SERVER_HOST=app-test -p 3000:3000 wallarm/fast-example-rails:latest bundle exec rspec spec/features/posts_spec.rb '
+                    sh label: 'stop fast and selenium', script: ' docker stop selenium fast '
+                    }
+                }
+              stage('Test Num 2') {
+
+                steps {
+                    sh label: 'create network', script: 'docker network create my-network2'
+                    sh label: 'run fast with ci_mode=recording', script: 'docker run --name fast -d -e WALLARM_API_TOKEN=$WALLARM_API_TOKEN -e CI_MODE="recording" -e WALLARM_API_HOST="api.wallarm.com" -p 8088:8080 --network my-network2 -e BUILD_ID=${env.BUILD_ID} --rm wallarm/fast '
+                    sh label: 'run selenium', script: ' docker run --rm -d --name selenium -p 4444:4444 -e http_proxy=\'http://fast:8080\' -e https_proxy=\'https://fast:8080\' --network my-network selenium/standalone-firefox:latest '
+                    sh label: 'run app-test', script: ' docker run --rm --name app-test --network my-network -e CAPYBARA_SERVER_HOST=app-test -p 3000:3000 wallarm/fast-example-rails:latest bundle exec rspec spec/features/posts_spec.rb '
+                    sh label: 'stop fast and selenium', script: ' docker stop selenium fast '
+                }
+            }
+         }
+      }
+      stage('SecurityTest') {
+         steps {
+            sh label: 'start app', script: ' docker run --rm -d --name app-test --network my-network -e CAPYBARA_SERVER_HOST=app-test -p 3000:3000 wallarm/fast-example-rails:latest  '
+            sh label: 'sleep', script: ' sleep 5 '
+            sh label: 'run fast in testing mode', script: 'docker run --name fast -e WALLARM_API_TOKEN="6+McVl1Zi8z9yUBmQ/5oKDpm0DW6+2nbXLq4jaFPGveBDGbL7cREnZ7SngLvWz+M" -e CI_MODE="testing" -e WALLARM_API_HOST="api.wallarm.com"  --network my-network -e TEST_RUN_POLICY_ID=240 -e TEST_RUN_URI="http://app-test:3000" --rm wallarm/fast'
+            sh label: 'sleep', script: ' sleep 5  '
+            sh label: 'stop fast and app-test', script: ' docker stop fast app-test '
+
+            sh label: 'rm network', script: ' docker network rm my-network '
+         }
+      }
+   }
+   post {
+        failure {
+                sh label: 'stop docker', script: ' docker stop fast selenium app-test'
+                sh label: 'rm network', script:  ' docker network rm my-network '
+        }
+    }
+}
